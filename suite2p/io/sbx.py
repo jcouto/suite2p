@@ -71,8 +71,8 @@ def sbx_to_binary(ops, ndeadcols=-1, ndeadrows=0):
     
     for ifile,sbxfname in enumerate(sbxlist):
         f = sbx_memmap(sbxfname)
-        nplanes = f.shape[1]
-        nchannels = f.shape[2]
+        nplanessbx = f.shape[1]
+        nchannelssbx = f.shape[2]
         nframes = f.shape[0]
         iblocks = np.arange(0,nframes,ops1[0]['batch_size'])
         if iblocks[-1] < nframes:
@@ -90,7 +90,7 @@ def sbx_to_binary(ops, ndeadcols=-1, ndeadrows=0):
             im = im.astype(np.int16)
             im2mean = im.mean(axis = 0).astype(np.float32)/len(iblocks) 
             for ichan in range(nchannels):
-                nframes = im.shape[0]
+                nframeschunk = im.shape[0]
                 im2write = im[:,:,ichan,:,:]
                 for j in range(0,nplanes):
                     if iall==0:
@@ -105,8 +105,8 @@ def sbx_to_binary(ops, ndeadcols=-1, ndeadrows=0):
                         ops1[j]['meanImg_chan2'] += np.squeeze(im2mean[j,ichan,:,:])
                         reg_file_chan2[j].write(bytearray(im2write[:,j,:,:].astype('int16')))
                         
-                    ops1[j]['nframes'] += im2write.shape[0]
-                    ops1[j]['nframes_per_folder'][ifile] += im2write.shape[0]
+            ops1[j]['nframes'] += im2write.shape[0]
+            ops1[j]['nframes_per_folder'][ifile] += im2write.shape[0]
             ik += nframes
             iall += nframes
 
